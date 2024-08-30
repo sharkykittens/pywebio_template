@@ -20,5 +20,6 @@ def server(
 
 
 if __name__ == "__main__":
-    load_dotenv()
+    env_file_path = os.path.abspath(os.path.join(os.path.abspath(__file__),"..","..","..",".env"))
+    load_dotenv(env_file_path)
     app()

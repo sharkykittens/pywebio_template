@@ -1,8 +1,5 @@
-import os
 import sys
 import uuid
-import typer
-import pywebio
 import pywebio.pin as webpin
 import pywebio.input as webin
 import pywebio.output as webout

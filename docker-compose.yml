@@ -1,5 +1,4 @@
 services:
-
   miniostorage:
     image: minio/minio:latest
     ports:
@@ -14,8 +13,8 @@ services:
     networks:
       - webapp
     profiles:
-      - dev
-      - prod
+      - internal-dev
+      - internal-prod
 
   psql:
     image: postgres:latest
@@ -30,13 +29,24 @@ services:
     networks:
       - webapp
     profiles:
-      - dev
-      - prod
+      - internal-dev
+      - internal-prod
 
   webapp:
     image: webapp
     restart: unless-stopped
-    
+    build:
+      context: app
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      - "DB_URL=postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@psql:5432/mydb"
+    networks:
+      - webapp
+    profiles:
+      - internal-prod
+      - external-prod
 
 networks:
   webapp:
