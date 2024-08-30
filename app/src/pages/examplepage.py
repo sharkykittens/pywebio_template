@@ -3,7 +3,6 @@ import pywebio.input as webin
 import pywebio.output as webout
 import pywebio.session as websession
 
-from loguru import logger
 from functools import partial
 
 class ExamplePage:
@@ -13,7 +12,7 @@ class ExamplePage:
         # example of creating multiple put calls while iterating and retaining context
 
         def print_button(id):
-            logger.debug(id)
+            self.logger.debug(id)
 
         with webout.use_scope("main_body"):
 

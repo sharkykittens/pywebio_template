@@ -3,6 +3,7 @@ import typer
 
 from loguru import logger
 from baseapp import BaseWebapp
+from dotenv import load_dotenv
 from typing_extensions import Annotated
 from pywebio.platform.fastapi import start_server
 
@@ -19,4 +20,5 @@ def server(
 
 
 if __name__ == "__main__":
+    load_dotenv()
     app()

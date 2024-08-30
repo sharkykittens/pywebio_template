@@ -1,4 +1,6 @@
 import os
+import sys
+import uuid
 import typer
 import pywebio
 import pywebio.pin as webpin
@@ -21,13 +23,26 @@ class BaseWebapp(
 
     def __init__(self):
         super().__init__()
+        self.id = str(uuid.uuid4())
+        self.initialize_logger()
         self.init_master_page_settings()
         self.define_layout()
-        logger.info(websession.info)
+        self.logger.info(websession.info)
         
         #webout.put_text('Hello')
         websession.defer_call(self.cleanup)
         self.start_app()
+
+    def initialize_logger(self):
+
+        log_format = "<green>{time:YYYY-MM-DD HH:mm:ss}</green> | " \
+                     "{level.icon} <level>{level: <8}</level> | " \
+                     "<cyan>{extra[identifier]}</cyan> | " \
+                     "<level>{message}</level>"
+        
+        logger.remove()
+        logger.add(sys.stderr, format=log_format, colorize=True)
+        self.logger = logger.bind(identifier=self.id)
 
     def init_master_page_settings(self):
         # Clear default pywebio footer
@@ -49,6 +64,7 @@ class BaseWebapp(
     """
         webout.put_html(style)
 
+
     def define_layout(self):
 
         webout.put_row([
@@ -65,6 +81,6 @@ class BaseWebapp(
         
     def cleanup(self):
         # cleanup logic when user closes the session
-        logger.info("Session exited!")
+        self.logger.info("Session exited!")
 
 

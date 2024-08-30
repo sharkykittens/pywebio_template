@@ -3,8 +3,8 @@ services:
   miniostorage:
     image: minio/minio:latest
     ports:
-      - 9000:9000
-      - 9001:9001
+      - "${MINIO_PORT}:9000"
+      - "${MINIO_UI_PORT}:9001"
     env_file:
       - .env
     restart: unless-stopped
@@ -21,7 +21,7 @@ services:
     image: postgres:latest
     restart: unless-stopped
     ports:
-      - 5432:5432
+      - "${POSTGRES_PORT}:5432"
     env_file:
       - .env
     user: root
@@ -32,6 +32,11 @@ services:
     profiles:
       - dev
       - prod
+
+  webapp:
+    image: webapp
+    restart: unless-stopped
+    
 
 networks:
   webapp:
