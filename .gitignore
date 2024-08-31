@@ -1,2 +1,4 @@
 __pycache__
 .env
+minio/minio_data/*
+postgres/postgres_backup/*

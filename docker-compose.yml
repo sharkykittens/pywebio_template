@@ -9,7 +9,7 @@ services:
     restart: unless-stopped
     command: server /data --console-address ":9001"
     volumes:
-      - "./minio/minio_data:/data"
+      - "${PWD}/minio/minio_data:/data"
     networks:
       - webapp
     profiles:
@@ -25,11 +25,33 @@ services:
       - .env
     user: root
     volumes:
-      - ./postgres/postgres_data:/var/lib/postgresql/data
+      - ${PWD}/postgres/postgres_data:/var/lib/postgresql/data
     networks:
       - webapp
     profiles:
       - internal-dev
+      - internal-prod
+
+  psql_backup:
+    image: postgres:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    user: root
+    volumes:
+      - ${PWD}/postgres/postgres_backup:/backup
+    depends_on:
+      - psql
+    command: >
+      bash -c "while true; do
+        PGPASSWORD=$$POSTGRES_PASSWORD pg_dump -h psql -U $$POSTGRES_USER -Fc $$POSTGRES_DB > /backup/$$(date +%Y-%m-%d-%H-%M-%S).dump
+        echo ""Backup done at $$(date +%Y-%m-%d_%H:%M:%S)""
+        ls -1 /backup/*.dump | head -n -2 | xargs rm -f
+        sleep 86400
+      done"
+    networks:
+      - webapp
+    profiles:
       - internal-prod
 
   webapp:
@@ -38,10 +60,14 @@ services:
     build:
       context: app
       dockerfile: Dockerfile
+    ports:
+      - 5555:${SERVER_PORT}
     env_file:
       - .env
     environment:
-      - "DB_URL=postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@psql:5432/mydb"
+      - "DB_URL=postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@psql:5432/$POSTGRES_DB"
+    volumes:
+      - ${PWD}/schema.prisma:/app/schema.prisma
     networks:
       - webapp
     profiles:
