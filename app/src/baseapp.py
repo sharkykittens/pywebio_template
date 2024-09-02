@@ -23,10 +23,10 @@ class BaseWebapp(
         self.id = str(uuid.uuid4())
         self.initialize_logger()
         self.init_master_page_settings()
+        self.handle_login()
         self.define_layout()
         self.logger.info(websession.info)
         
-        #webout.put_text('Hello')
         websession.defer_call(self.cleanup)
         self.start_app()
 
@@ -65,16 +65,19 @@ class BaseWebapp(
     def define_layout(self):
 
         webout.put_row([
-            webout.put_scope("main_sidebar").style('width: 10vw; !background-color: red;'),
+            webout.put_scope("main_sidebar").style('width: 10vw; display: flex; flex-direction: column; justify-content: space-between; border-right: 2px solid #0333; padding-left: 5px; !background-color: red;'),
             webout.put_column([
                 webout.put_scope("main_header").style('height: 5vh; !background-color: yellow;'),
                 webout.put_scope("main_body").style('height: 85vh; !background-color: green; '),
                 webout.put_scope("main_footer").style('height: 10vh; !background-color: blue; ')
-            ]).style('width: 90vw; height: 100vh;')
+            ]).style('width: 90vw; height: 100vh; padding-left: 10px;')
         ]).style('height: 100vh;')
 
-    def start_app(self):
+    def handle_login(self):
         self.render_login_page()
+
+    def start_app(self):
+        self.render_example_page()
         
     def cleanup(self):
         # cleanup logic when user closes the session
